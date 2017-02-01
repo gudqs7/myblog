@@ -1,0 +1,26 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+      http://www.springframework.org/schema/context  
+      http://www.springframework.org/schema/context/spring-context.xsd  
+      http://www.springframework.org/schema/mvc  
+      http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<!-- 定义一个邮箱发送的bean，用于发送邮件 -->
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.qq.com" />	<!-- 邮箱发送服务器（如smtp.qq.com) -->
+		<property name="port" value="587" />			<!-- 服务端口号 -->
+		<property name="username" value="768446359@qq.com" />	<!-- 验证的用户名 -->
+		<property name="password" value="vcgebdkxabqbbdih" />	<!-- 验证的密码 -->
+		<property name="protocol" value="smtp" />	<!-- 指定协议（smtp） -->
+		<property name="defaultEncoding" value="utf-8" /><!-- 默认编码 -->
+		<property name="javaMailProperties">		<!-- 一些其他配置，如是否需要验证用户 -->
+			<props>
+				<prop key="mail.smtp.auth">true</prop><!-- 是否需要验证用户 -->
+			</props>
+		</property>
+	</bean>
+
+</beans>  

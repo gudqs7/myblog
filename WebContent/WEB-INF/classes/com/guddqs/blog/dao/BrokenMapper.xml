@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.guddqs.blog.dao.BrokenMapper" >
+  <resultMap id="BaseResultMap" type="com.guddqs.blog.entity.Broken" >
+    <id column="ID" property="id" jdbcType="OTHER" />
+    <result column="CONTENT" property="content" jdbcType="OTHER" />
+    <result column="PIC" property="pic" jdbcType="OTHER" />
+    <result column="PUBDATE" property="pubdate" jdbcType="OTHER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, CONTENT, PIC, PUBDATE
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="map" >
+    select * from (
+	       select * from (
+    
+			    select
+			    b.* ,rownum rn
+			    from BROKEN b
+			    <if test="example != null" >
+			      <include refid="Example_Where_Clause" />
+			    </if>
+    <![CDATA[        )where rn>(#{pager.currentPage}-1)*#{pager.pageSize}
+	)where rn<=#{pager.currentPage}*#{pager.pageSize}
+     ]]>
+    <if test="example!=null and example.orderByClause != null" >
+      order by ${example.orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from BROKEN
+    where ID = #{id,jdbcType=OTHER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from BROKEN
+    where ID = #{id,jdbcType=OTHER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.guddqs.blog.entity.BrokenExample" >
+    delete from BROKEN
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.guddqs.blog.entity.Broken" >
+    <selectKey resultType="int" order="BEFORE" keyProperty="id">
+	    	select seq_blog.nextval from dual
+	 </selectKey>
+    insert into BROKEN (ID, CONTENT, PIC, PUBDATE
+      )
+    values (#{id,jdbcType=OTHER}, #{content,jdbcType=OTHER}, #{pic,jdbcType=OTHER}, #{pubdate,jdbcType=OTHER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.guddqs.blog.entity.Broken" >
+    <selectKey resultType="int" order="BEFORE" keyProperty="id">
+	    	select seq_blog.nextval from dual
+	 </selectKey>
+    insert into BROKEN
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="content != null" >
+        CONTENT,
+      </if>
+      <if test="pic != null" >
+        PIC,
+      </if>
+      <if test="pubdate != null" >
+        PUBDATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=OTHER},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=OTHER},
+      </if>
+      <if test="pic != null" >
+        #{pic,jdbcType=OTHER},
+      </if>
+      <if test="pubdate != null" >
+        #{pubdate,jdbcType=OTHER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="map" resultType="java.lang.Integer" >
+    select count(*) from BROKEN
+    <if test="example != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update BROKEN
+    <set >
+      <if test="record.id != null" >
+        ID = #{record.id,jdbcType=OTHER},
+      </if>
+      <if test="record.content != null" >
+        CONTENT = #{record.content,jdbcType=OTHER},
+      </if>
+      <if test="record.pic != null" >
+        PIC = #{record.pic,jdbcType=OTHER},
+      </if>
+      <if test="record.pubdate != null" >
+        PUBDATE = #{record.pubdate,jdbcType=OTHER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update BROKEN
+    set ID = #{record.id,jdbcType=OTHER},
+      CONTENT = #{record.content,jdbcType=OTHER},
+      PIC = #{record.pic,jdbcType=OTHER},
+      PUBDATE = #{record.pubdate,jdbcType=OTHER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.guddqs.blog.entity.Broken" >
+    update BROKEN
+    <set >
+      <if test="content != null" >
+        CONTENT = #{content,jdbcType=OTHER},
+      </if>
+      <if test="pic != null" >
+        PIC = #{pic,jdbcType=OTHER},
+      </if>
+      <if test="pubdate != null" >
+        PUBDATE = #{pubdate,jdbcType=OTHER},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=OTHER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.guddqs.blog.entity.Broken" >
+    update BROKEN
+    set CONTENT = #{content,jdbcType=OTHER},
+      PIC = #{pic,jdbcType=OTHER},
+      PUBDATE = #{pubdate,jdbcType=OTHER}
+    where ID = #{id,jdbcType=OTHER}
+  </update>
+</mapper>

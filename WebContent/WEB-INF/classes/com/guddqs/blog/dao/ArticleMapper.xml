@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.guddqs.blog.dao.ArticleMapper" >
+  <resultMap id="BaseResultMap" type="com.guddqs.blog.entity.Article" >
+    <id column="ID" property="id" jdbcType="OTHER" />
+    <result column="TITLE" property="title" jdbcType="OTHER" />
+    <result column="CONTENT" property="content" jdbcType="OTHER" />
+    <result column="PUBDATE" property="pubdate" jdbcType="OTHER" />
+    <result column="AUTHOR" property="author" jdbcType="OTHER" />
+    <result column="LOOKTIME" property="looktime" jdbcType="OTHER" />
+    <result column="LOVE" property="love" jdbcType="OTHER" />
+    <result column="PIC" property="pic" jdbcType="OTHER" />
+    <result column="TYPEID" property="typeid" jdbcType="OTHER" />
+    <result column="STATE" property="state" jdbcType="OTHER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, TITLE, CONTENT, PUBDATE, AUTHOR, LOOKTIME, LOVE, PIC, TYPEID ,STATE
+  </sql>
+  
+  <resultMap type="article" id="myResultMap" extends="BaseResultMap">
+  
+  	<association property="type" javaType="type" column="TYPEID" select="com.guddqs.blog.dao.TypeMapper.selectByPrimaryKey"/>
+  
+  </resultMap>
+  
+  
+  <select id="selectByExample" resultMap="myResultMap" parameterType="map" >
+   
+    select * from (
+	       select * from (
+	             	select 
+				    A.*,ROWNUM rn
+				    from ARTICLE A
+				    <if test="example != null" >
+				      <include refid="Example_Where_Clause" />
+				    </if>
+				    
+	 <![CDATA[        )where rn>(#{pager.currentPage}-1)*#{pager.pageSize}
+	)where rn<=#{pager.currentPage}*#{pager.pageSize}
+     ]]>
+    <if test="example != null and example.orderByClause != null" >
+      order by ${example.orderByClause}
+    </if>
+    
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from ARTICLE
+    where ID = #{id,jdbcType=OTHER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from ARTICLE
+    where ID = #{id,jdbcType=OTHER}
+  </delete>
+  <delete id="deleteByExample" parameterType="map" >
+    delete from ARTICLE
+    <if test="example != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.guddqs.blog.entity.Article" >
+    <selectKey resultType="int" order="BEFORE" keyProperty="id">
+	    	select seq_blog.nextval from dual
+	 </selectKey>
+    insert into ARTICLE (ID, TITLE, CONTENT, 
+      PUBDATE, AUTHOR, LOOKTIME, 
+      LOVE, PIC, TYPEID ,STATE)
+    values (#{id,jdbcType=OTHER}, #{title,jdbcType=OTHER}, #{content,jdbcType=CLOB}, 
+      #{pubdate,jdbcType=OTHER}, #{author,jdbcType=OTHER}, #{looktime,jdbcType=OTHER}, 
+      #{love,jdbcType=OTHER}, #{pic,jdbcType=OTHER}, #{typeid,jdbcType=OTHER}, #{state,jdbcType=OTHER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.guddqs.blog.entity.Article" >
+    <selectKey resultType="int" order="BEFORE" keyProperty="id">
+	    	select seq_blog.nextval from dual
+	 </selectKey>
+    insert into ARTICLE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="title != null" >
+        TITLE,
+      </if>
+      <if test="content != null" >
+        CONTENT,
+      </if>
+      <if test="pubdate != null" >
+        PUBDATE,
+      </if>
+      <if test="author != null" >
+        AUTHOR,
+      </if>
+      <if test="looktime != null" >
+        LOOKTIME,
+      </if>
+      <if test="love != null" >
+        LOVE,
+      </if>
+      <if test="pic != null" >
+        PIC,
+      </if>
+      <if test="typeid != null" >
+        TYPEID,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=OTHER},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=OTHER},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=OTHER},
+      </if>
+      <if test="pubdate != null" >
+        #{pubdate,jdbcType=OTHER},
+      </if>
+      <if test="author != null" >
+        #{author,jdbcType=OTHER},
+      </if>
+      <if test="looktime != null" >
+        #{looktime,jdbcType=OTHER},
+      </if>
+      <if test="love != null" >
+        #{love,jdbcType=OTHER},
+      </if>
+      <if test="pic != null" >
+        #{pic,jdbcType=OTHER},
+      </if>
+      <if test="typeid != null" >
+        #{typeid,jdbcType=OTHER},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=OTHER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="map" resultType="java.lang.Integer" >
+    select count(*) from ARTICLE
+    <if test="example != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update ARTICLE
+    <set >
+      <if test="record.id != null" >
+        ID = #{record.id,jdbcType=OTHER},
+      </if>
+      <if test="record.title != null" >
+        TITLE = #{record.title,jdbcType=OTHER},
+      </if>
+      <if test="record.content != null" >
+        CONTENT = #{record.content,jdbcType=OTHER},
+      </if>
+      <if test="record.pubdate != null" >
+        PUBDATE = #{record.pubdate,jdbcType=OTHER},
+      </if>
+      <if test="record.author != null" >
+        AUTHOR = #{record.author,jdbcType=OTHER},
+      </if>
+      <if test="record.looktime != null" >
+        LOOKTIME = #{record.looktime,jdbcType=OTHER},
+      </if>
+      <if test="record.love != null" >
+        LOVE = #{record.love,jdbcType=OTHER},
+      </if>
+      <if test="record.pic != null" >
+        PIC = #{record.pic,jdbcType=OTHER},
+      </if>
+      <if test="record.typeid != null" >
+        TYPEID = #{record.typeid,jdbcType=OTHER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update ARTICLE
+    set ID = #{record.id,jdbcType=OTHER},
+      TITLE = #{record.title,jdbcType=OTHER},
+      CONTENT = #{record.content,jdbcType=OTHER},
+      PUBDATE = #{record.pubdate,jdbcType=OTHER},
+      AUTHOR = #{record.author,jdbcType=OTHER},
+      LOOKTIME = #{record.looktime,jdbcType=OTHER},
+      LOVE = #{record.love,jdbcType=OTHER},
+      PIC = #{record.pic,jdbcType=OTHER},
+      TYPEID = #{record.typeid,jdbcType=OTHER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.guddqs.blog.entity.Article" >
+    update ARTICLE
+    <set >
+      <if test="title != null" >
+        TITLE = #{title,jdbcType=OTHER},
+      </if>
+      <if test="content != null" >
+        CONTENT = #{content,jdbcType=OTHER},
+      </if>
+      <if test="pubdate != null" >
+        PUBDATE = #{pubdate,jdbcType=OTHER},
+      </if>
+      <if test="author != null" >
+        AUTHOR = #{author,jdbcType=OTHER},
+      </if>
+      <if test="looktime != null" >
+        LOOKTIME = #{looktime,jdbcType=OTHER},
+      </if>
+      <if test="love != null" >
+        LOVE = #{love,jdbcType=OTHER},
+      </if>
+      <if test="pic != null" >
+        PIC = #{pic,jdbcType=OTHER},
+      </if>
+      <if test="typeid != null" >
+        TYPEID = #{typeid,jdbcType=OTHER},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=OTHER},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=OTHER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.guddqs.blog.entity.Article" >
+    update ARTICLE
+    set TITLE = #{title,jdbcType=OTHER},
+      CONTENT = #{content,jdbcType=OTHER},
+      PUBDATE = #{pubdate,jdbcType=OTHER},
+      AUTHOR = #{author,jdbcType=OTHER},
+      LOOKTIME = #{looktime,jdbcType=OTHER},
+      LOVE = #{love,jdbcType=OTHER},
+      PIC = #{pic,jdbcType=OTHER},
+      TYPEID = #{typeid,jdbcType=OTHER}
+    where ID = #{id,jdbcType=OTHER}
+  </update>
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+
+	<!-- 创建一个能读取properties文件的对象 -->
+	<bean name="config"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>classpath:jdbc.properties</value>
+		</property>
+	</bean>
+	<!--创建一个数据源，等下给spring用来创建sessionFactory -->
+	<bean name="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.class}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.pass}"></property>
+	</bean>
+
+	<!-- 创建spring提供的session工厂对象 -->
+	<bean name="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation">
+			<value>classpath:mybatis-config.xml</value>
+		</property>
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:com/guddqs/blog/dao/*.xml</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- 发现bug一枚， 当使用org.mybatis.spring.mapper.MapperScannerConfigurer的时候 注入属性是不能直接引用，因为spring容器此时初始化的顺序可能有不同，也许sqlsessionfactory尚未 
+		初始化，所以引用时就会出现一大堆不该出现，并且原因不直接在错误上的错误 所以应使用sqlSessionFactoryBeanName属性，value填mybatis 
+		sql工厂的id或者name属性 -->
+
+
+	<!-- 添加mybatis提供的映射扫描器，批量的将dao接口对应的映射文件映射生成dao接口的实现类，并加入spring容器中 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+		<property name="basePackage" value="com.guddqs.blog.dao"></property>
+	</bean>
+
+
+	<!-- 配置事务 -->
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 配置事务管理器的事务级别 -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 将切入点和事务管理器组合 -->
+	<aop:config>
+		<aop:pointcut expression="execution(* com.guddqs.blog..*.*(..))"
+			id="pc" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="pc" />
+	</aop:config>
+	
+
+</beans>
